@@ -1,0 +1,54 @@
+{
+  "backgroundUrl": "/images/bedroom/dusk-room.webp",
+  "alt": "ห้องนอนยามเย็น มีเตียงผ้าลายตาราง หน้าต่าง ชั้นหนังสือ และโคมไฟสีอุ่น",
+  "width": 1672,
+  "height": 941,
+  "sample": true,
+  "hotspots": [
+    {
+      "id": "teddy",
+      "label": "ตุ๊กตาหมี",
+      "categoryId": "memories",
+      "x": 16.5,
+      "y": 45.1,
+      "width": 13.7,
+      "height": 24.4,
+      "enabled": true,
+      "outlinePath": "M22 42C11 39 6 29 10 18C14 9 23 5 32 9C39 4 50 3 56 7C64 3 71 2 75 8C80 15 78 24 72 30C73 38 68 45 62 48C64 56 73 60 78 65C89 62 97 69 97 80C96 90 90 95 81 95C71 96 62 93 57 91C50 98 33 99 24 93C16 91 13 86 11 84C3 84 2 78 5 71C8 58 15 48 22 42Z"
+    },
+    {
+      "id": "bookshelf",
+      "label": "ชั้นหนังสือ",
+      "categoryId": "imagination",
+      "x": 54,
+      "y": 19.2,
+      "width": 23.7,
+      "height": 53.4,
+      "enabled": true,
+      "labelAbove": true,
+      "outlinePath": "M19 98H4V7H1L5 3L12 1L88 1L97 4L99 7H96L98 91L99 98H91L85 94H73M19 98L22 94H24"
+    },
+    {
+      "id": "star-mobile",
+      "label": "โมบายดวงดาว",
+      "categoryId": "dreams",
+      "x": 31.1,
+      "y": 0.6,
+      "width": 20.7,
+      "height": 40,
+      "enabled": true,
+      "outlinePath": "M16 31C16 22 42 22 53 23C77 23 87 28 87 32C87 36 72 39 63 39M17 32C23 38 40 39 52 39M38 51C51 58 68 51 62 43C59 38 55 35 51 34C56 44 50 53 38 51ZM15 46L19 56L26 49L22 59L35 67L22 67L16 78L13 68L2 69L8 62L4 54L13 58ZM84 45L86 53L97 51L91 58L98 66L87 65L84 74L81 64L72 66L77 59L71 54L81 56ZM51 69L54 78L65 77L59 83L65 90L54 89L52 99L49 90L38 91L43 84L37 77L49 78Z"
+    },
+    {
+      "id": "record-player",
+      "label": "เครื่องเล่นแผ่นเสียง",
+      "categoryId": "feelings",
+      "x": 54.6,
+      "y": 60.7,
+      "width": 17.4,
+      "height": 26,
+      "enabled": true,
+      "outlinePath": "M4 69L16 59L26 54L33 5Q34 1 40 2L95 6Q99 7 98 13L93 56Q92 61 88 62L88 83L78 96Q76 99 73 98L7 94Q3 94 3 90Z"
+    }
+  ]
+}

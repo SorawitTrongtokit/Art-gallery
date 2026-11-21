@@ -1,0 +1,38 @@
+[
+  {
+    "id": "memories",
+    "slug": "childhood-memories",
+    "name": "ความทรงจำในวัยเด็ก",
+    "englishName": "Childhood Memories",
+    "description": "เรื่องเล็ก ๆ ที่ยังอุ่นอยู่ในใจ ทั้งสถานที่ ผู้คน และช่วงเวลาธรรมดาที่อยากย้อนกลับไปเจออีกครั้ง",
+    "accent": "lavender",
+    "sample": true
+  },
+  {
+    "id": "imagination",
+    "slug": "little-imaginations",
+    "name": "โลกแห่งจินตนาการ",
+    "englishName": "Little Imaginations",
+    "description": "เมื่อกระดาษแผ่นเดียวพาเราออกเดินทางได้ทุกที่ มองโลกผ่านสิ่งที่เด็กคนหนึ่งวาดขึ้นในใจ",
+    "accent": "peach",
+    "sample": true
+  },
+  {
+    "id": "dreams",
+    "slug": "under-the-stars",
+    "name": "ความฝันใต้แสงดาว",
+    "englishName": "Under the Stars",
+    "description": "ความฝันที่ค่อย ๆ ปรากฏเมื่อท้องฟ้ามืดลง ตั้งแต่บ้านหลังเล็กใต้แสงจันทร์ไปจนถึงการเดินทางไกลเกินขอบฟ้า",
+    "accent": "blue",
+    "sample": true
+  },
+  {
+    "id": "feelings",
+    "slug": "echoes-of-feeling",
+    "name": "เสียงสะท้อนของความรู้สึก",
+    "englishName": "Echoes of Feeling",
+    "description": "ความรู้สึกเล็ก ๆ ที่อธิบายเป็นคำพูดได้ยาก แต่กลับมีสี แสง และรูปร่างของตัวเอง",
+    "accent": "gold",
+    "sample": true
+  }
+]
