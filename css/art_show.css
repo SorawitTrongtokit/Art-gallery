@@ -1,0 +1,367 @@
+/* css/art_show.css */
+.art-show-layout {
+  max-width: 1680px;
+  margin: 0 auto;
+  padding: 28px 36px 56px;
+  display: grid;
+  grid-template-columns: 38% 1fr;
+  gap: 36px;
+  align-items: start;
+}
+
+/* ================= ฝั่งซ้าย: รายละเอียดหมวด ================= */
+.category-info-panel {
+  position: sticky;
+  top: calc(var(--header-pc-height) + 24px);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow-soft);
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.back-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: all 0.2s;
+}
+
+.back-btn:hover {
+  background: var(--accent-dark);
+  color: #FFFFFF;
+}
+
+.cat-code {
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-dark);
+  color: #FFFFFF;
+}
+
+.en-title {
+  font-size: clamp(1.7rem, 2.5vw, 2.4rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 22px;
+}
+
+.element-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.element-circle {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: var(--bg-main);
+  border: 1.5px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.th-label {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.th-title {
+  font-size: 1.45rem;
+  font-weight: 700;
+}
+
+.poem-box {
+  background: var(--bg-main);
+  border-left: 3px solid var(--accent-dark);
+  padding: 16px 20px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  white-space: pre-line;
+  margin-bottom: 18px;
+}
+
+.desc-box {
+  font-size: 0.94rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* ================= ฝั่งขวา: แกลเลอรีผลงาน ================= */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.art-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.art-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-card);
+}
+
+.art-thumb {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background: var(--bg-muted);
+  overflow: hidden;
+}
+
+.art-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.35s ease;
+}
+
+.art-card:hover .art-thumb img {
+  transform: scale(1.05);
+}
+
+.art-card-meta {
+  padding: 12px 14px;
+}
+
+.art-card-meta h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.art-card-meta p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ================= POPUP MODAL (เบลอฉากหลัง) ================= */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(17, 17, 17, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 980px;
+  max-height: 88vh;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.25);
+  overflow-y: auto;
+  transform: translateY(16px) scale(0.98);
+  transition: transform 0.25s ease;
+}
+
+.modal-overlay.open .modal-card {
+  transform: translateY(0) scale(1);
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.92);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover {
+  background: var(--accent-dark);
+  color: #FFFFFF;
+}
+
+.modal-body {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  min-height: 520px;
+}
+
+.modal-image-wrap {
+  background: var(--bg-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal-image-wrap img {
+  width: 100%;
+  max-height: 75vh;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+}
+
+.modal-details {
+  padding: 36px 36px 36px 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.modal-category-pill {
+  display: inline-block;
+  width: fit-content;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-muted);
+  margin-bottom: 12px;
+}
+
+.modal-details h2 {
+  font-size: 1.75rem;
+  line-height: 1.25;
+  margin-bottom: 6px;
+}
+
+.modal-artist {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.modal-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 16px;
+  background: var(--bg-main);
+  border-radius: var(--radius-sm);
+  margin-bottom: 22px;
+}
+
+.meta-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.meta-value {
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.modal-concept h3 {
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+.modal-concept p {
+  font-size: 0.94rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1280px) {
+  .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 1024px) {
+  .art-show-layout {
+    grid-template-columns: 1fr;
+    padding: 20px 24px 48px;
+    gap: 24px;
+  }
+
+  .category-info-panel {
+    position: static;
+    text-align: center;
+  }
+
+  .element-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .poem-box {
+    text-align: left;
+  }
+
+  .gallery-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .modal-body {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-details {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 540px) {
+  .art-show-layout { padding: 16px 14px 40px; }
+  .category-info-panel { padding: 22px 18px; }
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .modal-overlay { padding: 14px; }
+  .modal-image-wrap { padding: 16px; }
+}
