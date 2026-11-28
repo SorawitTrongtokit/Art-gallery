@@ -1,0 +1,62 @@
+---
+import AdminLayout from '../../components/AdminLayout.astro';
+import { history } from '../../lib/server/catalog';
+const page = Math.max(1, Math.min(10000, Number.parseInt(Astro.url.searchParams.get('page') ?? '', 10) || 1));
+const admin = Astro.locals.admin!;
+const records = await history(admin.client, (page - 1) * 50);
+const labels = { save: 'บันทึกร่าง', publish: 'เผยแพร่', archive: 'เก็บเข้าคลัง', restore: 'กู้คืนเป็นร่าง' };
+const format = new Intl.DateTimeFormat('th-TH', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Bangkok' });
+---
+<AdminLayout title="ประวัติ" heading="ประวัติการเปลี่ยนแปลง" description="ตรวจรายการแก้ไขและนำฉบับก่อนหน้ากลับมาเป็นร่าง" section="history">
+  <section class="panel" data-history>
+    <p class="status" role="status" data-feedback></p>
+    {records.length ? <div class="table-wrap">
+      <table>
+        <thead><tr><th>วันและเวลา</th><th>รายการ</th><th>กิจกรรม</th><th>บัญชี</th><th>กู้ฉบับ</th></tr></thead>
+        <tbody>
+          {records.map((record) => {
+            const { entry } = record;
+            const href = (entry.kind === 'artwork' ? '/admin/works/' : '/admin/content/') + entry.key;
+            return <tr>
+              <td><time datetime={record.created_at}>{format.format(new Date(record.created_at))}</time></td>
+              <td><a href={href}>{entry.kind === 'category' ? 'หมวด ' : ''}{entry.key === 'home' ? 'หน้าแรก' : entry.key}</a></td>
+              <td>{labels[record.action]}</td>
+              <td>{record.actor_id === admin.user.id ? admin.user.email ?? 'คุณ' : record.actor_id}</td>
+              <td>{record.revision_id && !entry.archived_at && (record.action === 'save' || record.action === 'publish') &&
+                <button class="button secondary compact" type="button" data-copy-revision={record.revision_id}
+                  data-kind={entry.kind} data-key={entry.key} data-expected={entry.draft_id ?? entry.published_id ?? ''}
+                  data-after={href} disabled>คัดลอกเป็นร่าง</button>}</td>
+            </tr>;
+          })}
+        </tbody>
+      </table>
+    </div> : <p class="muted">ยังไม่มีประวัติในหน้านี้</p>}
+    <nav class="page-links" aria-label="หน้าประวัติ">
+      {page > 1 && <a href={'/admin/history?page=' + (page - 1)}>ก่อนหน้า</a>}
+      <span>หน้า {page}</span>
+      {records.length === 50 && <a href={'/admin/history?page=' + (page + 1)}>ถัดไป</a>}
+    </nav>
+  </section>
+</AdminLayout>
+<script>
+  import { adminRequest, explain, feedback } from '../../scripts/admin-request';
+  const panel = document.querySelector<HTMLElement>('[data-history]');
+  panel?.querySelectorAll<HTMLButtonElement>('[data-copy-revision]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      if (!confirm('คัดลอกฉบับนี้มาแทนร่างล่าสุดของรายการหรือไม่?')) return;
+      button.disabled = true;
+      feedback(panel, 'กำลังสร้างฉบับร่าง…');
+      try {
+        await adminRequest('copy-revision', {
+          kind: button.dataset.kind, key: button.dataset.key, revision: button.dataset.copyRevision,
+          expected: button.dataset.expected || null,
+        });
+        window.location.assign(button.dataset.after ?? '/admin/history');
+      } catch (error) {
+        feedback(panel, explain(error), true);
+        button.disabled = false;
+      }
+    });
+    button.disabled = false;
+  });
+</script>

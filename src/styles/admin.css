@@ -1,0 +1,94 @@
+:root {
+  color-scheme: light;
+  --ink: #211b2c;
+  --muted: #645e6a;
+  --paper: #f6f4f8;
+  --surface: #fff;
+  --line: #e4dfe9;
+  --primary: #5738a1;
+  --primary-hover: #40257c;
+  --soft: #eee8fa;
+  --danger: #95323d;
+  --radius: 0.8rem;
+  font-family: 'Prompt', 'Leelawadee UI', 'Noto Sans Thai', system-ui, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: var(--paper); line-height: 1.55; font-size: 0.98rem; }
+a { color: var(--primary); text-underline-offset: 0.16em; }
+button, input, textarea, select { font: inherit; }
+:focus-visible { outline: 3px solid #8668c7; outline-offset: 3px; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+.admin-shell { max-width: 76rem; width: min(100% - 2.25rem, 76rem); margin-inline: auto; }
+.admin-header { background: var(--surface); border-bottom: 1px solid var(--line); }
+.admin-top { min-height: 4.8rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.admin-brand { color: var(--ink); text-decoration: none; font-size: 1.25rem; font-weight: 800; letter-spacing: -0.045em; }
+.admin-brand span { display: block; color: var(--muted); font-size: 0.77rem; font-weight: 500; letter-spacing: 0; }
+.quiet-link { font-size: 0.88rem; }
+.admin-nav { display: flex; gap: 0.25rem; overflow-x: auto; }
+.admin-nav a { padding: 0.7rem 1rem; border-bottom: 3px solid transparent; text-decoration: none; font-weight: 600; white-space: nowrap; color: var(--muted); }
+.admin-nav a:hover { color: var(--primary); }
+.admin-nav a[aria-current='page'] { color: var(--primary); border-color: var(--primary); }
+.admin-main { padding-block: 2rem 4rem; }
+.section-heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; }
+.section-heading h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.8rem); line-height: 1.15; letter-spacing: -0.04em; }
+.section-heading p { margin: 0.65rem 0 0; color: var(--muted); }
+.panel { padding: 1.2rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.panel + .panel { margin-top: 1rem; }
+.panel h2 { margin: 0 0 0.65rem; font-size: 1.18rem; }
+.panel p { margin-block: 0.4rem 1rem; }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+.card-grid .panel { margin: 0; }
+.stat-value { display: block; font-size: 2rem; line-height: 1.1; font-weight: 800; letter-spacing: -0.05em; margin-top: 0.35rem; }
+.muted { color: var(--muted); }
+.button-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.55rem; }
+.button { display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; padding: 0.56rem 0.95rem; border: 1px solid var(--primary); border-radius: 0.5rem; background: var(--primary); color: white; text-decoration: none; cursor: pointer; font-weight: 650; min-height: 2.5rem; }
+.button:hover { background: var(--primary-hover); }
+.button.secondary { border-color: var(--line); background: var(--surface); color: var(--ink); }
+.button.secondary:hover { background: var(--soft); }
+.button.danger { color: var(--danger); }
+.button.compact { padding: 0.35rem 0.66rem; font-size: 0.87rem; min-height: 2.1rem; }
+.button:disabled { opacity: 0.55; cursor: default; }
+.field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.9rem; }
+.full { grid-column: 1 / -1; }
+.field { display: flex; flex-direction: column; gap: 0.32rem; min-width: 0; font-weight: 650; }
+.field small, .help { color: var(--muted); font-weight: 400; }
+.field input:not([type='checkbox']), .field textarea, .field select {
+  width: 100%; min-width: 0; min-height: 2.65rem; border: 1px solid #cfc7da; border-radius: 0.45rem;
+  background: white; color: var(--ink); padding: 0.52rem 0.65rem; font-weight: 400;
+}
+.field textarea { resize: vertical; min-height: 5.5rem; }
+.check { display: inline-flex; align-items: center; gap: 0.5rem; }
+input[type='checkbox'] { inline-size: 1rem; block-size: 1rem; accent-color: var(--primary); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: end; margin-bottom: 1rem; }
+.toolbar .field { flex: 1 1 10rem; }
+.toolbar .search-field { flex-basis: 15rem; }
+.status { min-height: 1.45em; color: var(--muted); margin: 0.6rem 0 0; overflow-wrap: anywhere; }
+.status.error { color: var(--danger); font-weight: 600; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; text-align: start; }
+th, td { padding: 0.76rem 0.65rem; border-bottom: 1px solid var(--line); vertical-align: top; text-align: start; }
+th { white-space: nowrap; font-weight: 650; color: var(--muted); font-size: 0.87rem; }
+tbody tr:last-child td { border-bottom: 0; }
+td small { display: block; color: var(--muted); }
+.pill { display: inline-block; border-radius: 1rem; padding: 0.18rem 0.58rem; background: var(--soft); color: #4a2e83; font-size: 0.8rem; font-weight: 650; white-space: nowrap; }
+.page-links { display: flex; align-items: center; gap: 0.7rem; margin-top: 1rem; flex-wrap: wrap; }
+.field-photo { width: 9rem; max-height: 10rem; border-radius: 0.55rem; object-fit: contain; background: var(--paper); }
+.entry-summary { display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: center; margin-block: 0 1rem; }
+.editor-actions { margin-top: 1rem; }
+.repeat-row { border: 1px solid var(--line); border-radius: 0.65rem; padding: 0.85rem; margin-block: 0.65rem; }
+.repeat-row .button-group { margin-bottom: 0.75rem; }
+.login-main { max-width: 29rem; margin-top: min(12vh, 5rem); }
+.login-main .field { margin: 0.8rem 0; }
+.login-main .button { width: 100%; margin-top: 0.4rem; }
+progress { accent-color: var(--primary); height: 0.65rem; width: 100%; }
+@media (max-width: 620px) {
+  .admin-shell { width: calc(100% - 1.25rem); }
+  .admin-top { padding-block: 0.55rem; }
+  .admin-top .button-group { justify-content: end; }
+  .admin-nav a { padding-inline: 0.7rem; }
+  .section-heading { align-items: start; flex-direction: column; }
+  .field-grid { grid-template-columns: minmax(0, 1fr); }
+  .admin-main { padding-top: 1.35rem; }
+  .panel { padding: 0.85rem; }
+}

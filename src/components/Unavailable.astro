@@ -1,0 +1,11 @@
+---
+import PublicLayout from './PublicLayout.astro';
+import { categoryPages } from '../lib/catalog';
+Astro.response.status = 503;
+---
+<PublicLayout title="นิทรรศการกำลังเตรียมพร้อม — Inner Child" categories={categoryPages([])}>
+  <main style="max-width: 44rem; margin: 4rem auto; padding: 1rem;">
+    <h1>นิทรรศการกำลังเตรียมพร้อม</h1>
+    <p>ยังโหลดข้อมูลไม่ได้ กรุณาเปิดหน้าอีกครั้งในภายหลัง</p>
+  </main>
+</PublicLayout>

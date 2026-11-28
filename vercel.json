@@ -1,0 +1,8 @@
+{
+  "regions": ["sin1"],
+  "git": {
+    "deploymentEnabled": {
+      "codex/astro-supabase-admin": false
+    }
+  }
+}

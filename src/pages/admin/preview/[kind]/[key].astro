@@ -1,0 +1,27 @@
+---
+import Gallery from '../../../../components/Gallery.astro';
+import Home from '../../../../components/Home.astro';
+import PublicLayout from '../../../../components/PublicLayout.astro';
+import { artworkSchema, categorySchema, homeSchema } from '../../../../lib/catalog';
+import { entry, publicArtworks, publicCategories } from '../../../../lib/server/catalog';
+const { kind, key } = Astro.params;
+if (!key || (kind !== 'home' && kind !== 'category' && kind !== 'artwork')) return Astro.redirect('/admin');
+const current = await entry(Astro.locals.admin!.client, kind, key);
+const back = kind === 'artwork' ? '/admin/works/' + key : '/admin/content/' + key;
+if (!current?.draft || current.archived_at) return Astro.redirect(back);
+const content = current.draft.content;
+const draftArtwork = kind === 'artwork' ? artworkSchema.parse(content) : undefined;
+const draftHome = kind === 'home' ? homeSchema.parse(content) : undefined;
+const categories = await publicCategories();
+const base = categories.find(({ code }) => code === (draftArtwork?.categoryCode ?? key));
+const previewCategory = base && (kind === 'category' ? { ...base, ...categorySchema.parse(content) } : base);
+if (kind === 'category' && previewCategory) categories.splice(categories.findIndex(({ code }) => code === key), 1, previewCategory);
+const published = previewCategory ? await publicArtworks(previewCategory.code) : [];
+const works = draftArtwork
+  ? [{ id: current.draft.id, key, data: draftArtwork }, ...published.filter((work) => work.key !== key)]
+  : published;
+---
+<PublicLayout title="ตัวอย่างฉบับร่าง — Inner Child" categories={categories} active={draftHome ? 'home' : previewCategory?.code} previewBack={back}>
+  {draftHome && <Home home={draftHome} preview />}
+  {previewCategory && <Gallery category={previewCategory} works={works} draftKey={draftArtwork ? key : undefined} />}
+</PublicLayout>

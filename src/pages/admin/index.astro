@@ -1,0 +1,44 @@
+---
+import AdminLayout from '../../components/AdminLayout.astro';
+import { missingArtworkFields } from '../../lib/catalog';
+import { editingArtwork, entries, publicCategories } from '../../lib/server/catalog';
+const admin = Astro.locals.admin!;
+const [records, categories] = await Promise.all([entries(admin.client, 'artwork'), publicCategories()]);
+const active = records.filter((record) => !record.archived_at).map((record) => ({
+  record, artwork: editingArtwork(record),
+}));
+const stats = [
+  { label: 'ผลงานในรายการ', count: active.length },
+  { label: 'เผยแพร่แล้ว', count: active.filter(({ record }) => record.published_id).length },
+  { label: 'รอเผยแพร่', count: active.filter(({ record }) => record.draft_id).length },
+  { label: 'ข้อมูลฉบับล่าสุดยังไม่ครบ', count: active.filter(({ artwork }) => missingArtworkFields(artwork).length).length },
+];
+---
+<AdminLayout title="ภาพรวม" heading="ภาพรวมงานนิทรรศการ" description="ตรวจความพร้อมของผลงานทั้ง 7 หมวด" section="overview">
+  <div class="button-group" slot="actions">
+    <a href="/admin/import" class="button secondary">นำเข้าเป็นชุด</a><a href="/admin/works/new" class="button">เพิ่มผลงาน</a>
+  </div>
+  <div class="card-grid">
+    {stats.map(({ label, count }) => <section class="panel"><span class="muted">{label}</span><strong class="stat-value">{count}</strong></section>)}
+  </div>
+  <section class="panel">
+    <h2>สถานะตามหมวด</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>หมวด</th><th>ในรายการ</th><th>เผยแพร่</th><th>รอเผยแพร่</th><th>ข้อมูลขาด</th></tr></thead>
+        <tbody>
+          {categories.map((category) => {
+            const group = active.filter(({ artwork }) => artwork.categoryCode === category.code);
+            const published = active.filter(({ record }) => (record.published?.content as ReturnType<typeof editingArtwork> | undefined)?.categoryCode === category.code);
+            const incomplete = group.filter(({ artwork }) => missingArtworkFields(artwork).length).length;
+            return <tr>
+              <td><a href={'/admin/works?category=' + category.code}>{category.code} {category.thTitle}</a></td>
+              <td>{group.length}</td><td>{published.length}</td><td>{group.filter(({ record }) => record.draft_id).length}</td>
+              <td>{incomplete ? <a href={'/admin/works?status=incomplete&category=' + category.code}>{incomplete} รายการ</a> : '0'}</td>
+            </tr>;
+          })}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</AdminLayout>

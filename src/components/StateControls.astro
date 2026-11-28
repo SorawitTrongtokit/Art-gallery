@@ -1,0 +1,16 @@
+---
+import type { Entry } from '../lib/server/catalog';
+import { expectedRevision } from '../lib/server/catalog';
+const { entry, after, preview } = Astro.props as { entry: Entry; after: string; preview?: string };
+---
+<div class="button-group" data-state-controls data-id={entry.id} data-expected={expectedRevision(entry) ?? ''} data-after={after}>
+  {entry.draft_id && !entry.archived_at && preview && <a class="button secondary" href={preview}>ดูตัวอย่างร่าง</a>}
+  {entry.draft_id && !entry.archived_at && <button class="button" type="button" data-state="publish" disabled>เผยแพร่ฉบับร่าง</button>}
+  {entry.kind === 'artwork' && (entry.archived_at
+    ? <button class="button secondary" type="button" data-state="restore" disabled>กู้คืนเป็นร่าง</button>
+    : <button class="button secondary danger" type="button" data-state="archive" disabled>เก็บเข้าคลัง</button>)}
+  <p class="status" role="status" data-feedback></p>
+</div>
+<script>
+  import '../scripts/admin-state';
+</script>

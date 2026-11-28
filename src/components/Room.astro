@@ -1,0 +1,56 @@
+---
+import '../../css/main_menu.css';
+import roomImage from '../../images/background.jpg';
+import type { CategoryPage } from '../lib/catalog';
+const { categories } = Astro.props as { categories: CategoryPage[] };
+const panels = [0, 1, 2];
+---
+<main class="room-wrapper">
+  <div class="room-viewport" id="roomViewport">
+    {panels.map((panel) => <div class="snap-slot" data-page={panel}></div>)}
+    <div class="room-stage">
+      <img src={roomImage.src} alt="ห้องนิทรรศการ Inner Child" class="room-bg" width={roomImage.width} height={roomImage.height} />
+      {categories.map((category) => (
+        <a href={'/gallery/' + category.slug} class={'hotspot hs-' + Number(category.code)}
+          aria-label={category.code + ' ' + category.enTitle + ' ' + category.thTitle}>
+          <span class="hotspot-badge">{category.code} {category.code === '07' ? category.thTitle.split('/')[0].trim() : category.thTitle}</span>
+        </a>
+      ))}
+    </div>
+  </div>
+  <div class="room-pager">
+    <button type="button" class="pager-btn" id="roomPrev" aria-label="ส่วนก่อนหน้า">←</button>
+    <div class="pager-dots">
+      {panels.map((panel) => <button type="button" class:list={['pager-dot', {active: panel === 0}]}
+        data-index={panel} aria-label={'ส่วนที่ ' + (panel + 1)} />)}
+    </div>
+    <button type="button" class="pager-btn" id="roomNext" aria-label="ส่วนถัดไป">→</button>
+  </div>
+</main>
+<script>
+  const viewport = document.getElementById('roomViewport');
+  const dots = [...document.querySelectorAll<HTMLButtonElement>('.pager-dot')];
+  let current = 0;
+  function update(index: number) {
+    current = Math.max(0, Math.min(dots.length - 1, index));
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === current);
+      dot.setAttribute('aria-current', String(i === current));
+    });
+  }
+  function go(index: number) {
+    if (!viewport) return;
+    update(index);
+    viewport.scrollTo({
+      left: current * viewport.clientWidth,
+      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+    });
+  }
+  viewport?.addEventListener('scroll', () => {
+    if (viewport.clientWidth) update(Math.round(viewport.scrollLeft / viewport.clientWidth));
+  }, { passive: true });
+  document.getElementById('roomPrev')?.addEventListener('click', () => go(current - 1));
+  document.getElementById('roomNext')?.addEventListener('click', () => go(current + 1));
+  dots.forEach((dot, i) => dot.addEventListener('click', () => go(i)));
+  update(0);
+</script>

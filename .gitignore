@@ -1,0 +1,11 @@
+node_modules/
+.astro/
+.vercel/
+.local/
+dist/
+.env*
+!.env.example
+playwright-report/
+test-results/
+supabase/.branches/
+supabase/.temp/

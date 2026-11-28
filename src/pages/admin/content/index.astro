@@ -1,0 +1,27 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import { categories } from '../../../lib/catalog';
+import { entries, entryStatus } from '../../../lib/server/catalog';
+const client = Astro.locals.admin!.client;
+const [categoryRecords, homeRecords] = await Promise.all([entries(client, 'category'), entries(client, 'home')]);
+const items = [
+  { key: 'home', title: 'หน้าแรก', description: 'เรื่องราว ช่องทางติดต่อ และสไลด์', entry: homeRecords[0] },
+  ...categories.map(({ code, thTitle, enTitle }) => ({
+    key: code, title: code + ' ' + thTitle, description: enTitle, entry: categoryRecords.find(({ key }) => key === code),
+  })),
+];
+---
+<AdminLayout title="เนื้อหาเว็บ" heading="จัดการเนื้อหาเว็บ" description="แก้หน้าแรกและข้อมูลหมวด จากนั้นตรวจร่างก่อนเผยแพร่" section="content">
+  <section class="panel table-wrap">
+    <table>
+      <thead><tr><th>หน้าและหมวด</th><th>สถานะ</th><th>การจัดการ</th></tr></thead>
+      <tbody>
+        {items.map(({ key, title, description, entry }) => <tr>
+          <td><strong>{title}</strong><small>{description}</small></td>
+          <td><span class="pill">{entry && (entry.draft_id || entry.published_id) ? entryStatus(entry) : 'ยังไม่มีฉบับบันทึก'}</span></td>
+          <td><a class="button secondary compact" href={'/admin/content/' + key} aria-label={'แก้ไข ' + title}>แก้ไข</a></td>
+        </tr>)}
+      </tbody>
+    </table>
+  </section>
+</AdminLayout>

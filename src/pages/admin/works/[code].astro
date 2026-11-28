@@ -1,0 +1,56 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import StateControls from '../../../components/StateControls.astro';
+import { imagePath, missingArtworkFields, workCode } from '../../../lib/catalog';
+import { editingArtwork, entry, entryStatus, expectedRevision, publicCategories } from '../../../lib/server/catalog';
+const currentCode = Astro.params.code ?? '';
+const isNew = currentCode === 'new';
+const code = workCode.safeParse(currentCode);
+if (!isNew && !code.success) return Astro.redirect('/admin/works');
+const [current, categories] = await Promise.all([
+  isNew || !code.success ? Promise.resolve(null) : entry(Astro.locals.admin!.client, 'artwork', code.data),
+  publicCategories(),
+]);
+if (!isNew && !current) return Astro.redirect('/admin/works');
+const artwork = editingArtwork(current);
+const missing = missingArtworkFields(artwork);
+const title = isNew ? 'เพิ่มผลงาน' : artwork.title || currentCode;
+---
+<AdminLayout title={title} heading={title} description="บันทึกร่างก่อนดูตัวอย่างหรือเผยแพร่" section="works">
+  <a href="/admin/works" class="button secondary" slot="actions">กลับรายการผลงาน</a>
+  {current && <section class="panel">
+    <div class="entry-summary"><span class="pill">{entryStatus(current)}</span><strong>{current.key}</strong>
+      {missing.length > 0 && <span class="muted">ยังขาด {missing.join(', ')}</span>}
+    </div>
+    <StateControls entry={current} after={'/admin/works/' + current.key} preview={'/admin/preview/artwork/' + current.key} />
+  </section>}
+  {!current?.archived_at && <form method="post" class="panel" data-work-editor data-expected={current ? expectedRevision(current) ?? '' : ''}
+    data-image-id={artwork.imageId ?? ''}>
+    <div class="field-grid">
+      <label class="field">รหัสผลงาน<input name="code" value={current?.key ?? ''} readonly={!!current} placeholder="IC-001"
+        required maxlength="40" pattern="[A-Za-z0-9][A-Za-z0-9\-]*" /></label>
+      <label class="field">หมวด<select name="categoryCode">
+        {categories.map(({code, thTitle}) => <option value={code} selected={artwork.categoryCode === code}>{code} {thTitle}</option>)}
+      </select></label>
+      <label class="field">ชื่อผลงาน<input name="title" value={artwork.title} maxlength="240" /></label>
+      <label class="field">ผู้สร้าง<input name="artist" value={artwork.artist} maxlength="240" /></label>
+      <label class="field">เทคนิค<input name="technique" value={artwork.technique} maxlength="240" /></label>
+      <label class="field">ประเภท<input name="type" value={artwork.type} maxlength="240" /></label>
+      <label class="field full">แนวคิด<textarea name="concept" maxlength="12000" rows="5">{artwork.concept}</textarea></label>
+      <div class="full">
+        {artwork.imageId && <img class="field-photo" src={imagePath(artwork.imageId, 'thumb', true)} alt={artwork.imageAlt || artwork.title} />}
+        <label class="field">รูปผลงาน<input name="photo" type="file" accept="image/jpeg,image/png,image/webp" />
+          <small>เลือก JPG, PNG หรือ WebP หนึ่งไฟล์</small>
+        </label>
+        {artwork.imageId && <label class="check"><input type="checkbox" name="removePhoto" />ล้างรูปในฉบับร่าง</label>}
+      </div>
+      <label class="field full">คำอธิบายรูปสำหรับโปรแกรมอ่านหน้าจอ<input name="imageAlt" value={artwork.imageAlt} maxlength="240" /></label>
+    </div>
+    <div class="editor-actions"><button class="button" type="submit" disabled>บันทึกร่าง</button>
+      <p class="status" role="status" data-feedback>{Astro.url.searchParams.has('saved') ? 'บันทึกร่างแล้ว' : ''}</p>
+    </div>
+  </form>}
+</AdminLayout>
+<script>
+  import '../../../scripts/work-editor';
+</script>

@@ -1,0 +1,11 @@
+---
+import PublicLayout from '../components/PublicLayout.astro';
+import { categoryPages } from '../lib/catalog';
+Astro.response.status = 404;
+---
+<PublicLayout title="ไม่พบหน้า — Inner Child" categories={categoryPages([])}>
+  <main style="max-width: 44rem; margin: 4rem auto; padding: 1rem;">
+    <h1>ไม่พบหน้าที่คุณเปิด</h1>
+    <a href="/room">กลับห้องนิทรรศการ</a>
+  </main>
+</PublicLayout>

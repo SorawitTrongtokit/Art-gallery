@@ -1,0 +1,37 @@
+---
+import { imagePath } from '../lib/catalog';
+const { group, values = {} } = Astro.props as {
+  group: 'steps' | 'contacts' | 'slides';
+  values?: { title?: string; text?: string; label?: string; url?: string; tag?: string; imageId?: string | null; imageAlt?: string };
+};
+const { title, text, label, url, tag, imageId, imageAlt } = values;
+---
+<div class="repeat-row" data-repeat-row data-image-id={imageId ?? ''}>
+  <div class="button-group">
+    <strong data-row-label></strong>
+    <button type="button" class="button secondary compact" data-move="up" aria-label="เลื่อนขึ้น">↑</button>
+    <button type="button" class="button secondary compact" data-move="down" aria-label="เลื่อนลง">↓</button>
+    <button type="button" class="button secondary compact danger" data-remove-row>เอาออกจากร่าง</button>
+  </div>
+  <div class="field-grid">
+    {group === 'steps' && <>
+      <label class="field full">หัวข้อย่อย<input data-field="title" value={title ?? ''} maxlength="240" /></label>
+      <label class="field full">รายละเอียด<textarea data-field="text" maxlength="12000" rows="3">{text ?? ''}</textarea></label>
+    </>}
+    {group === 'contacts' && <>
+      <label class="field">ชื่อช่องทาง<input data-field="label" value={label ?? ''} maxlength="240" /></label>
+      <label class="field">ลิงก์<input type="url" data-field="url" value={url ?? ''} maxlength="1000" placeholder="https:// หรือ mailto:" /></label>
+    </>}
+    {group === 'slides' && <>
+      <label class="field">ป้ายกำกับ<input data-field="tag" value={tag ?? ''} maxlength="240" /></label>
+      <label class="field">ชื่อสไลด์<input data-field="title" value={title ?? ''} maxlength="240" /></label>
+      <label class="field full">คำอธิบายสไลด์<textarea data-field="text" maxlength="12000" rows="2">{text ?? ''}</textarea></label>
+      <div class="full">
+        {imageId && <img class="field-photo" src={imagePath(imageId, 'thumb', true)} alt={imageAlt || title || ''} />}
+        <label class="field">รูปสไลด์<input data-field="photo" type="file" accept="image/jpeg,image/png,image/webp" /></label>
+        {imageId && <label class="check"><input type="checkbox" data-field="removePhoto" />ล้างรูปในฉบับร่าง</label>}
+      </div>
+      <label class="field full">คำอธิบายรูป<input data-field="imageAlt" value={imageAlt ?? ''} maxlength="240" /></label>
+    </>}
+  </div>
+</div>

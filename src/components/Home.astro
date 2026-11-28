@@ -1,0 +1,83 @@
+---
+import '../../css/index.css';
+import { imagePath, type Home } from '../lib/catalog';
+const { home, preview = false } = Astro.props as { home: Home; preview?: boolean };
+const featuredName = /\binner child\b/i.exec(home.storyIntro);
+---
+<main class="index-main">
+  {home.slides.length > 0 && (
+    <section class="carousel-section" aria-label="ไฮไลต์และของที่ระลึก" data-carousel>
+      <div class="carousel-stage" data-stage>
+        {home.slides.length > 1 && <button type="button" class="carousel-nav prev" data-prev aria-label="ก่อนหน้า">❮</button>}
+        <div class="carousel-track">
+          {home.slides.map((slide, index) => (
+            <article class="carousel-card" data-card style={index ? 'opacity:0' : 'opacity:1'}>
+              {slide.imageId && <img src={imagePath(slide.imageId, 'display', preview)} alt={slide.imageAlt || slide.title}
+                loading={index ? 'lazy' : 'eager'} decoding="async" draggable="false" />}
+              <div class="carousel-card-body">
+                <span class="carousel-tag">{slide.tag}</span><h3>{slide.title}</h3><p>{slide.text}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+        {home.slides.length > 1 && <button type="button" class="carousel-nav next" data-next aria-label="ถัดไป">❯</button>}
+      </div>
+      {home.slides.length > 1 && <div class="carousel-dots">
+        {home.slides.map((_, index) => <button type="button" data-dot class:list={['carousel-dot', {active: index === 0}]} aria-label={'สไลด์ที่ ' + (index + 1)} />)}
+        <button type="button" class="carousel-pause" data-pause aria-label="หยุดสไลด์อัตโนมัติ" aria-pressed="false">Ⅱ</button>
+      </div>}
+    </section>
+  )}
+  <section class="cta-section">
+    <a href="/room" class="start-btn"><span>Start Exhibition</span><span class="arrow" aria-hidden="true">→</span></a>
+  </section>
+  {(home.storyTitle || home.storyIntro || home.steps.length > 0 || home.contactTitle || home.contactText || home.contacts.length > 0) &&
+    <section class="story-section">
+      {(home.storyTitle || home.storyIntro || home.steps.length > 0) && <div class="story-card">
+        <span class="section-badge">Story &amp; Concept</span>
+        <h2>{home.storyTitle}</h2>
+        <p class="lead">{featuredName ? <>{home.storyIntro.slice(0, featuredName.index)}<strong>{featuredName[0]}</strong>{home.storyIntro.slice(featuredName.index + featuredName[0].length)}</> : home.storyIntro}</p>
+        <div class="story-grid">
+          {home.steps.map((step, index) => <div class="story-step">
+            <span class="step-num">{String(index + 1).padStart(2, '0')}</span><h3>{step.title}</h3><p>{step.text}</p>
+          </div>)}
+        </div>
+      </div>}
+      {(home.contactTitle || home.contactText || home.contacts.length > 0) && <footer class="contact-card">
+        <div><h3>{home.contactTitle}</h3><p>{home.contactText}</p></div>
+        <div class="contact-links">
+          {home.contacts.map(({ label, url }) => url
+            ? <a href={url} class="pill-outline">{label || url}</a>
+            : <span class="pill-outline">{label}</span>)}
+        </div>
+      </footer>}
+    </section>
+  }
+</main>
+<script>
+  import '../scripts/carousel';
+</script>
+<style>
+  .lead, .story-step p, .contact-card p { white-space: pre-line; }
+  .carousel-dots { position: relative; }
+  .carousel-pause {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-end: 0;
+    transform: translateY(-50%);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    color: var(--text-primary);
+    background: var(--bg-card);
+    min-width: 26px;
+    min-height: 26px;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .carousel-section:is(:hover, :focus-within, [data-touch-controls]) .carousel-pause {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  [data-stage] { touch-action: pan-y; }
+</style>

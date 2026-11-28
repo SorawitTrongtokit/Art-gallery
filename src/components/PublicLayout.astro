@@ -1,0 +1,78 @@
+---
+import '../../css/common.css';
+import type { CategoryPage } from '../lib/catalog';
+
+const { title, categories, active, previewBack } = Astro.props as {
+  title: string;
+  categories: CategoryPage[];
+  active?: string;
+  previewBack?: string;
+};
+Astro.response.headers.set('Cache-Control', 'no-store');
+---
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {previewBack && <meta name="robots" content="noindex,nofollow" />}
+  </head>
+  <body>
+    {previewBack && <div class="preview-banner"><strong>ตัวอย่างฉบับร่าง</strong> <a href={previewBack}>กลับไปแก้ไข</a></div>}
+    <header id="site-header">
+      <div class="site-header-wrapper">
+        <div class="header-top">
+          <a href="/" class="brand-group">
+            <div class="logo-circle" aria-hidden="true"><span>LOGO</span></div>
+            <div class="brand-text"><h1>inner child</h1><p>งานนิทรรศการศิลปะ ชั้นมัธยมศึกษาปีที่ 6 ปีการศึกษา 2569</p></div>
+          </a>
+          <button type="button" class="hamburger-btn" aria-label="เมนู" aria-expanded="false" aria-controls="mainNavbar">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+        <nav class="navbar" id="mainNavbar" aria-label="เมนูหลัก">
+          <ul class="nav-list">
+            <li><a href="/" class:list={['nav-link', { active: active === 'home' }]} aria-current={active === 'home' ? 'page' : undefined}>About Us</a></li>
+            <li><a href="/room" class:list={['nav-link', { active: active === 'room' }]} aria-current={active === 'room' ? 'page' : undefined}>Main Menu</a></li>
+            {categories.map((category) => (
+              <li><a href={'/gallery/' + category.slug} class:list={['nav-link', { active: active === category.code }]}
+                aria-current={active === category.code ? 'page' : undefined} title={category.enTitle}>
+                {category.code} {category.thTitle}
+              </a></li>
+            ))}
+            <li><a class="nav-link" href="#personality" data-personality>Personality Test</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <slot />
+  </body>
+</html>
+<script>
+  const menu = document.querySelector<HTMLButtonElement>('.hamburger-btn');
+  const nav = document.getElementById('mainNavbar');
+  function setExpanded(open: boolean) {
+    menu?.setAttribute('aria-expanded', String(open));
+    menu?.classList.toggle('open', open);
+    nav?.classList.toggle('open', open);
+  }
+  menu?.addEventListener('click', () => setExpanded(menu.getAttribute('aria-expanded') !== 'true'));
+  document.addEventListener('click', (event) => {
+    if (event.target instanceof Node && !document.getElementById('site-header')?.contains(event.target)) setExpanded(false);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && menu?.getAttribute('aria-expanded') === 'true') {
+      setExpanded(false);
+      menu.focus();
+    }
+  });
+  document.querySelector('[data-personality]')?.addEventListener('click', (event) => {
+    event.preventDefault();
+    alert('หน้า Personality Test กำลังอยู่ระหว่างการพัฒนา!');
+  });
+</script>
+<style>
+  .preview-banner { padding: 0.65rem 1rem; background: #252238; color: white; text-align: center; }
+  .preview-banner a { color: #fbd8ef; margin-inline-start: 1rem; text-decoration: underline; }
+</style>

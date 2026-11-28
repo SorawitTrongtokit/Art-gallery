@@ -1,0 +1,12 @@
+---
+import Home from '../components/Home.astro';
+import PublicLayout from '../components/PublicLayout.astro';
+import Unavailable from '../components/Unavailable.astro';
+import { publicCategories, publicHome } from '../lib/server/catalog';
+const page = await Promise.all([publicCategories(), publicHome()]).catch(() => null);
+---
+{page
+  ? <PublicLayout title="Inner Child — งานนิทรรศการศิลปะ ม.6 ปีการศึกษา 2569" categories={page[0]} active="home">
+    <Home home={page[1]} />
+  </PublicLayout>
+  : <Unavailable />}

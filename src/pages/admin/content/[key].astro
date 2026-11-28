@@ -1,0 +1,62 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import HomeFields from '../../../components/HomeFields.astro';
+import StateControls from '../../../components/StateControls.astro';
+import { categories, categorySchema, emptyHome, homeSchema } from '../../../lib/catalog';
+import { activeRevision, entry, entryStatus, expectedRevision } from '../../../lib/server/catalog';
+const key = Astro.params.key ?? '';
+const base = categories.find(({ code }) => code === key);
+const kind = key === 'home' ? 'home' : 'category';
+if (kind === 'category' && !base) return Astro.redirect('/admin/content');
+const current = await entry(Astro.locals.admin!.client, kind, key);
+if (!current) return Astro.redirect('/admin/content');
+const content = activeRevision(current)?.content;
+const home = kind === 'home' ? homeSchema.parse(content ?? emptyHome) : undefined;
+const category = base && categorySchema.parse(content ?? {
+  enTitle: base.enTitle, thTitle: base.thTitle, symbol: base.symbol, poem: '', description: '',
+});
+const groups = home ? [
+  { key: 'steps' as const, name: 'ตอนย่อยของเรื่องราว', singular: 'ตอน', rows: home.steps, max: 16 },
+  { key: 'contacts' as const, name: 'รายการช่องทางติดต่อ', singular: 'ช่องทาง', rows: home.contacts, max: 16 },
+  { key: 'slides' as const, name: 'สไลด์ไฮไลต์หน้าแรก', singular: 'สไลด์', rows: home.slides, max: 30 },
+] : [];
+const title = home ? 'เนื้อหาหน้าแรก' : 'หมวด ' + key + ' ' + category?.thTitle;
+const back = '/admin/content/' + key;
+---
+<AdminLayout title={title} heading={title} description="ตรวจฉบับร่างด้วยหน้าตาเว็บจริงก่อนเผยแพร่" section="content">
+  <a href="/admin/content" class="button secondary" slot="actions">กลับรายการเนื้อหา</a>
+  <section class="panel">
+    <div class="entry-summary"><span class="pill">{entryStatus(current)}</span></div>
+    <StateControls entry={current} after={back} preview={'/admin/preview/' + kind + '/' + key} />
+  </section>
+  <form method="post" class="panel" data-content-editor data-kind={kind} data-key={key} data-expected={expectedRevision(current) ?? ''}>
+    {category && <div class="field-grid">
+      <label class="field">ชื่อหมวดภาษาไทย<input name="thTitle" value={category.thTitle} maxlength="240" /></label>
+      <label class="field">ชื่อหมวดภาษาอังกฤษ<input name="enTitle" value={category.enTitle} maxlength="240" /></label>
+      <label class="field">สัญลักษณ์<input name="symbol" value={category.symbol} maxlength="24" /></label>
+      <label class="field full">คำอธิบายหมวด<textarea name="description" maxlength="12000">{category.description}</textarea></label>
+      <label class="field full">บทกลอน<textarea name="poem" maxlength="12000">{category.poem}</textarea></label>
+    </div>}
+    {home && <>
+      <div class="field-grid">
+        <label class="field full">ชื่อเรื่องราวนิทรรศการ<input name="storyTitle" value={home.storyTitle} maxlength="240" /></label>
+        <label class="field full">บทนำ<textarea name="storyIntro" maxlength="12000">{home.storyIntro}</textarea></label>
+        <label class="field">หัวข้อช่องทางติดต่อ<input name="contactTitle" value={home.contactTitle} maxlength="240" /></label>
+        <label class="field">ข้อความติดต่อ<textarea name="contactText" maxlength="12000">{home.contactText}</textarea></label>
+      </div>
+      {groups.map(({ key: group, name, singular, rows, max }) => <details class="repeat-row" open={group === 'slides'} data-repeat={group} data-singular={singular} data-max={max}>
+        <summary><strong>{name}</strong></summary>
+        <div data-repeat-items>{rows.map((values) => <HomeFields group={group} values={values} />)}</div>
+        <template data-repeat-template><HomeFields group={group} /></template>
+        <button class="button secondary compact" type="button" data-add-row disabled>เพิ่ม{singular}</button>
+      </details>)}
+    </>}
+    <div class="editor-actions">
+      <button type="submit" class="button" disabled>บันทึกร่าง</button>
+      <p class="status" role="status" data-feedback>{Astro.url.searchParams.has('saved') ? 'บันทึกร่างแล้ว' : ''}</p>
+    </div>
+  </form>
+</AdminLayout>
+<script>
+  import '../../../scripts/content-editor';
+</script>

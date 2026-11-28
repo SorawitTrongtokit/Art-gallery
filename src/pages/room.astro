@@ -1,0 +1,10 @@
+---
+import Room from '../components/Room.astro';
+import PublicLayout from '../components/PublicLayout.astro';
+import Unavailable from '../components/Unavailable.astro';
+import { publicCategories } from '../lib/server/catalog';
+const categories = await publicCategories().catch(() => null);
+---
+{categories
+  ? <PublicLayout title="Main Menu — Inner Child" categories={categories} active="room"><Room categories={categories} /></PublicLayout>
+  : <Unavailable />}

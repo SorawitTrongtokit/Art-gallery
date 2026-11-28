@@ -1,0 +1,16 @@
+---
+import Gallery from '../../components/Gallery.astro';
+import PublicLayout from '../../components/PublicLayout.astro';
+import Unavailable from '../../components/Unavailable.astro';
+import { categories } from '../../lib/catalog';
+import { publicArtworks, publicCategories } from '../../lib/server/catalog';
+const match = categories.find(({ slug }) => slug === Astro.params.slug);
+if (!match) return Astro.rewrite('/404');
+const page = await Promise.all([publicCategories(), publicArtworks(match.code)]).catch(() => null);
+const category = page?.[0].find(({ code }) => code === match.code);
+---
+{page && category
+  ? <PublicLayout title={category.enTitle + ' (' + category.thTitle + ') — Inner Child'} categories={page[0]} active={category.code}>
+    <Gallery category={category} works={page[1]} />
+  </PublicLayout>
+  : <Unavailable />}

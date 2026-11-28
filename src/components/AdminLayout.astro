@@ -1,0 +1,43 @@
+---
+import '../styles/admin.css';
+const { title, heading, description, section, signedIn = true } = Astro.props as {
+  title: string; heading?: string; description?: string; section?: string; signedIn?: boolean;
+};
+const links = [
+  { section: 'overview', label: 'ภาพรวม', href: '/admin' },
+  { section: 'works', label: 'ผลงาน', href: '/admin/works' },
+  { section: 'import', label: 'นำเข้า', href: '/admin/import' },
+  { section: 'content', label: 'เนื้อหาเว็บ', href: '/admin/content' },
+  { section: 'history', label: 'ประวัติ', href: '/admin/history' },
+];
+---
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>{title} · Inner Child</title>
+  </head>
+  <body class:list={['admin-body', { 'admin-login': !signedIn }]}>
+    {signedIn && <header class="admin-header">
+      <div class="admin-shell admin-top">
+        <a class="admin-brand" href="/admin">Inner Child<span>จัดการนิทรรศการ</span></a>
+        <div class="button-group">
+          <a href="/" class="quiet-link">ดูเว็บนิทรรศการ ↗</a>
+          <form method="post" action="/admin/logout"><button class="button secondary compact">ออกจากระบบ</button></form>
+        </div>
+      </div>
+      <nav class="admin-shell admin-nav" aria-label="เมนูผู้ดูแล">
+        {links.map((link) => <a href={link.href} aria-current={link.section === section ? 'page' : undefined}>{link.label}</a>)}
+      </nav>
+    </header>}
+    <main class:list={['admin-shell', 'admin-main', { 'login-main': !signedIn }]}>
+      {heading && <div class="section-heading">
+        <div><h1>{heading}</h1>{description && <p>{description}</p>}</div>
+        <slot name="actions" />
+      </div>}
+      <slot />
+    </main>
+  </body>
+</html>

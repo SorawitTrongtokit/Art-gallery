@@ -1,0 +1,115 @@
+---
+import '../../css/art_show.css';
+import { imagePath, type Artwork, type CategoryPage, type Saved } from '../lib/catalog';
+const { category, works, draftKey } = Astro.props as {
+  category: CategoryPage;
+  works: Saved<Artwork>[];
+  draftKey?: string;
+};
+---
+<main class="art-show-layout">
+  <aside class="category-info-panel">
+    <div class="category-header">
+      <a href="/room" class="back-btn" aria-label="กลับหน้าห้อง">←</a>
+      <span class="cat-code">{category.code}</span>
+    </div>
+    <h1 class="en-title">{category.enTitle}</h1>
+    <div class="element-row">
+      <div class="element-circle" aria-hidden="true">{category.symbol}</div>
+      <div class="th-title-wrap"><span class="th-label">หมวดหมู่</span><h2 class="th-title">{category.thTitle}</h2></div>
+    </div>
+    {category.poem && <blockquote class="poem-box">{category.poem}</blockquote>}
+    {category.description && <p class="desc-box">{category.description}</p>}
+  </aside>
+  <section class="gallery-panel" aria-label="รายการผลงานศิลปะ">
+    <div class="gallery-grid">
+      {works.map(({ key, data }) => {
+        const preview = key === draftKey;
+        return <article class="art-card">
+          <button type="button" class="art-card-button" aria-haspopup="dialog" aria-controls="artModal" data-artwork={key}
+            data-open-preview={preview ? 'true' : undefined} data-title={data.title} data-artist={data.artist}
+            data-technique={data.technique} data-type={data.type} data-concept={data.concept}
+            data-image={data.imageId ? imagePath(data.imageId, 'display', preview) : undefined}
+            data-alt={data.imageAlt || data.title}>
+            <span class="art-thumb">
+              {data.imageId && <img src={imagePath(data.imageId, 'thumb', preview)} alt={data.imageAlt || data.title} loading="lazy" decoding="async" />}
+            </span>
+            <span class="art-card-meta"><strong>{data.title || key}</strong><span>{data.artist}</span></span>
+          </button>
+        </article>;
+      })}
+    </div>
+    {works.length === 0 && <p class="gallery-empty">กำลังเตรียมผลงานสำหรับหมวดนี้</p>}
+  </section>
+</main>
+<dialog class="gallery-dialog" id="artModal" aria-labelledby="modalTitle">
+  <div class="modal-overlay open" data-backdrop>
+    <div class="modal-card">
+      <button type="button" class="modal-close" aria-label="ปิดหน้าต่าง" autofocus>&times;</button>
+      <div class="modal-body">
+        <div class="modal-image-wrap"><img id="modalImg" alt="" hidden /></div>
+        <div class="modal-details">
+          <span class="modal-category-pill">{category.code} {category.enTitle} • {category.thTitle}</span>
+          <h2 id="modalTitle"></h2>
+          <p class="modal-artist" id="modalArtist"></p>
+          <div class="modal-meta">
+            <div class="meta-item"><span class="meta-label">เทคนิค</span><span class="meta-value" id="modalTechnique"></span></div>
+            <div class="meta-item"><span class="meta-label">ประเภท</span><span class="meta-value" id="modalType"></span></div>
+          </div>
+          <div class="modal-concept"><h3>แนวคิดผลงาน</h3><p id="modalConcept"></p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('#artModal');
+  const image = document.querySelector<HTMLImageElement>('#modalImg');
+  let opener: HTMLButtonElement | undefined;
+  function setText(id: string, text: string) {
+    const element = document.getElementById(id);
+    if (element) element.textContent = text;
+  }
+  function open(card: HTMLButtonElement) {
+    if (!dialog || dialog.open || !image) return;
+    opener = card;
+    const data = card.dataset;
+    setText('modalTitle', data.title || data.artwork || 'ผลงาน');
+    setText('modalArtist', data.artist ? 'โดย ' + data.artist : '—');
+    setText('modalTechnique', data.technique || '—');
+    setText('modalType', data.type || '—');
+    setText('modalConcept', data.concept || '—');
+    image.hidden = !data.image;
+    if (data.image) image.src = data.image;
+    image.alt = data.alt || '';
+    document.body.classList.add('art-dialog-open');
+    dialog.showModal();
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-artwork]').forEach((card) => {
+    card.addEventListener('click', () => open(card));
+    if (card.dataset.openPreview) open(card);
+  });
+  dialog?.querySelector('button')?.addEventListener('click', () => dialog.close());
+  dialog?.querySelector('[data-backdrop]')?.addEventListener('click', (event) => {
+    if (event.currentTarget === event.target) dialog.close();
+  });
+  dialog?.addEventListener('close', () => {
+    image?.removeAttribute('src');
+    document.body.classList.remove('art-dialog-open');
+    opener?.focus({ preventScroll: true });
+  });
+</script>
+<style>
+  :global(body.art-dialog-open) { overflow: hidden; }
+  .gallery-dialog { max-width: 100%; max-height: 100%; width: 100%; height: 100%; background: transparent; color: inherit; border: 0; padding: 0; }
+  .gallery-dialog::backdrop { background: transparent; }
+  .art-card-button { width: 100%; display: block; background: none; border: 0; padding: 0; color: inherit; font: inherit; text-align: start; cursor: pointer; }
+  .art-card-button:focus-visible { outline: 3px solid var(--accent-dark); outline-offset: -3px; }
+  .art-thumb, .art-card-meta, .art-card-meta strong, .art-card-meta > span { display: block; }
+  .art-card-meta strong, .art-card-meta > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .art-card-meta strong { font-size: 0.95rem; font-weight: 600; }
+  .art-card-meta > span { font-size: 0.8rem; color: var(--text-secondary); }
+  #modalImg[hidden] { display: none; }
+  .modal-concept p { white-space: pre-line; }
+  .gallery-empty { padding: 1rem; color: var(--text-secondary); }
+</style>

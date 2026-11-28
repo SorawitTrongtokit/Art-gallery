@@ -1,0 +1,69 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import { missingArtworkFields } from '../../../lib/catalog';
+import { editingArtwork, entries, entryStatus, expectedRevision, publicCategories } from '../../../lib/server/catalog';
+const [records, categories] = await Promise.all([entries(Astro.locals.admin!.client, 'artwork'), publicCategories()]);
+const search = (Astro.url.searchParams.get('q') ?? '').trim().slice(0, 240);
+const category = Astro.url.searchParams.get('category') ?? '';
+const status = Astro.url.searchParams.get('status') ?? '';
+const rows = records.flatMap((record) => {
+  const artwork = editingArtwork(record);
+  const missing = missingArtworkFields(artwork);
+  if (search && ![record.key, artwork.title, artwork.artist].some((text) => text.toLowerCase().includes(search.toLowerCase()))) return [];
+  if (category && artwork.categoryCode !== category) return [];
+  if (status === 'archive' ? !record.archived_at : !!record.archived_at) return [];
+  if (status === 'incomplete' && !missing.length) return [];
+  if (status === 'draft' && !record.draft_id) return [];
+  if (status === 'published' && !record.published_id) return [];
+  return [{ record, artwork, missing }];
+});
+const statuses = [['', 'งานที่ยังใช้งาน'], ['draft', 'มีร่างรอเผยแพร่'], ['published', 'เผยแพร่แล้ว'],
+  ['incomplete', 'ข้อมูลยังไม่ครบ'], ['archive', 'เก็บเข้าคลัง']];
+---
+<AdminLayout title="ผลงาน" heading="จัดการผลงาน" description="ค้นหา ตรวจร่าง และเผยแพร่ผลงานทีละชิ้นหรือเป็นชุด" section="works">
+  <div class="button-group" slot="actions">
+    <a href="/admin/import" class="button secondary">นำเข้า CSV</a><a href="/admin/works/new" class="button">เพิ่มผลงาน</a>
+  </div>
+  <section class="panel">
+    <form method="get" class="toolbar">
+      <label class="field search-field">ค้นหาผลงาน<input name="q" value={search} placeholder="รหัส ชื่อ หรือผู้สร้าง" maxlength="240" /></label>
+      <label class="field">หมวด<select name="category">
+        <option value="">ทุกหมวด</option>
+        {categories.map(({code, thTitle}) => <option value={code} selected={category === code}>{code} {thTitle}</option>)}
+      </select></label>
+      <label class="field">สถานะ<select name="status">
+        {statuses.map(([value, label]) => <option value={value} selected={status === value}>{label}</option>)}
+      </select></label>
+      <button class="button secondary">ค้นหา</button>
+    </form>
+    <div data-bulk>
+      <div class="button-group">
+        <span>{rows.length} ผลงาน</span>
+        {status === 'archive' ? <button type="button" class="button secondary compact" data-bulk-action="restore" disabled>กู้คืนรายการที่เลือก</button>
+          : <>
+            <button type="button" class="button compact" data-bulk-action="publish" disabled>เผยแพร่รายการที่เลือก</button>
+            <button type="button" class="button secondary compact danger" data-bulk-action="archive" disabled>เก็บรายการที่เลือกเข้าคลัง</button>
+          </>}
+      </div>
+      <p class="status" role="status" data-feedback></p>
+      {rows.length ? <div class="table-wrap">
+        <table>
+          <thead><tr><th><input aria-label="เลือกทุกรายการ" type="checkbox" data-select-all /></th>
+            <th>ผลงาน</th><th>หมวด</th><th>สถานะ</th><th>ความพร้อมของฉบับล่าสุด</th></tr></thead>
+          <tbody>
+            {rows.map(({ record, artwork, missing }) => <tr>
+              <td><input type="checkbox" aria-label={'เลือก ' + record.key} data-item={record.id}
+                data-expected={expectedRevision(record) ?? ''} data-ready={record.draft_id && !missing.length ? 'yes' : 'no'} /></td>
+              <td><a href={'/admin/works/' + record.key}>{artwork.title || record.key}</a><small>{record.key} {artwork.artist && '· ' + artwork.artist}</small></td>
+              <td>{categories.find(({ code }) => code === artwork.categoryCode)?.thTitle}</td>
+              <td><span class="pill">{entryStatus(record)}</span></td><td>{missing.length ? missing.join(', ') : 'ครบ'}</td>
+            </tr>)}
+          </tbody>
+        </table>
+      </div> : <p class="muted">ยังไม่มีผลงานตรงกับตัวกรอง</p>}
+    </div>
+  </section>
+</AdminLayout>
+<script>
+  import '../../../scripts/admin-state';
+</script>

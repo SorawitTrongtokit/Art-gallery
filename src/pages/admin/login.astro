@@ -1,0 +1,39 @@
+---
+import AdminLayout from '../../components/AdminLayout.astro';
+import { sameOrigin } from '../../lib/server/auth';
+import { sessionClient } from '../../lib/server/supabase';
+
+let message = '';
+if (Astro.request.method === 'POST') {
+  if (!sameOrigin(Astro.request, Astro.url)) return new Response(null, { status: 403 });
+  const values = await Astro.request.formData();
+  const email = String(values.get('email') ?? '').trim();
+  const password = String(values.get('password') ?? '');
+  try {
+    const client = sessionClient(Astro.cookies, Astro.request, Astro.url.protocol === 'https:');
+    const { data, error } = await client.auth.signInWithPassword({ email, password });
+    if (!error && data.user) {
+      const { data: member, error: membershipError } = await client.from('catalog_admins').select('user_id')
+        .eq('user_id', data.user.id).maybeSingle();
+      if (member && !membershipError) return Astro.redirect('/admin', 303);
+      await client.auth.signOut({ scope: 'local' });
+    }
+    Astro.response.status = 401;
+    message = 'เข้าสู่ระบบไม่สำเร็จ ตรวจอีเมล รหัสผ่าน และสิทธิ์บัญชี';
+  } catch {
+    message = 'ระบบเข้าสู่ระบบยังไม่พร้อม กรุณาลองใหม่ในภายหลัง';
+    Astro.response.status = 503;
+  }
+}
+---
+<AdminLayout title="เข้าสู่ระบบ" heading="จัดการนิทรรศการ" description="เข้าสู่ระบบด้วยบัญชีแอดมิน Inner Child" signedIn={false}>
+  <section class="panel">
+    <form method="post">
+      <label class="field">อีเมล<input type="email" name="email" autocomplete="username" required maxlength="320" /></label>
+      <label class="field">รหัสผ่าน<input type="password" name="password" autocomplete="current-password" required maxlength="1024" /></label>
+      {message && <p class="status error" role="alert">{message}</p>}
+      <button class="button" type="submit">เข้าสู่ระบบ</button>
+    </form>
+  </section>
+  <p><a href="/">กลับเว็บนิทรรศการ</a></p>
+</AdminLayout>

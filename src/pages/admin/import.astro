@@ -1,0 +1,37 @@
+---
+import AdminLayout from '../../components/AdminLayout.astro';
+---
+<AdminLayout title="นำเข้า" heading="นำเข้าผลงานเป็นชุด" description="ตรวจรหัสผลงานและจับคู่รูปก่อนบันทึกเป็นร่าง" section="import">
+  <a href="/admin/template.csv" class="button secondary" slot="actions">ดาวน์โหลด CSV ตัวอย่าง</a>
+  <form method="post" class="panel" data-import-form>
+    <div class="field-grid">
+      <label class="field">ไฟล์ CSV<input name="csv" type="file" accept=".csv,text/csv" required />
+        <small>ส่งออกเป็น CSV แบบ UTF-8 ใช้รหัสหมวด 01–07</small>
+      </label>
+      <label class="field">ไฟล์รูปผลงาน<input name="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple />
+        <small>ชื่อไฟล์ต้องตรงกับช่อง image_file ถ้ารายการเดิมใช้รูปเดิมให้เว้นช่องนี้ว่าง</small>
+      </label>
+    </div>
+    <div class="editor-actions"><button class="button" type="submit" data-inspect disabled>ตรวจรายการนำเข้า</button></div>
+    <p class="status" role="status" data-feedback></p>
+  </form>
+  <section class="panel" data-import-review hidden>
+    <h2>ตรวจรายการก่อนบันทึก</h2>
+    <p data-import-summary></p>
+    <ul class="status error" data-import-issues></ul>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>บรรทัด CSV</th><th>รหัส</th><th>ผลงาน</th><th>หมวด</th><th>รูป</th><th>การเปลี่ยนแปลง</th></tr></thead>
+        <tbody data-import-rows></tbody>
+      </table>
+    </div>
+    <p class="status" role="status" data-feedback></p>
+    <div class="button-group">
+      <button type="button" class="button" data-import-commit disabled>ยืนยันบันทึกเป็นร่าง</button>
+      <a href="/admin/works?status=draft" class="button secondary" data-import-success hidden>เปิดรายการฉบับร่าง</a>
+    </div>
+  </section>
+</AdminLayout>
+<script>
+  import '../../scripts/import-editor';
+</script>
